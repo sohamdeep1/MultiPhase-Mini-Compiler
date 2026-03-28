@@ -24,3 +24,10 @@ var TOKEN_TYPES = {
   EOF:         { label: 'EOF',       color: '#475569', bg: 'rgba(71,85,105,0.08)'  },
   UNKNOWN:     { label: 'UNKNOWN',   color: '#f87171', bg: 'rgba(248,113,113,0.12)' },
 };
+
+/* Language Definition */
+var KEYWORDS = new Set([
+  'int', 'float', 'string', 'bool', 'void', 'char',
+  'if', 'else', 'while', 'for', 'return', 'print',
+  'true', 'false', 'break', 'continue', 'null'
+]);
