@@ -31,3 +31,12 @@ var KEYWORDS = new Set([
   'if', 'else', 'while', 'for', 'return', 'print',
   'true', 'false', 'break', 'continue', 'null'
 ]);
+
+var OPERATORS = new Set([
+  '+', '-', '*', '/', '%',
+  '=', '==', '!=',
+  '<', '>', '<=', '>=',
+  '&&', '||', '!',
+  '++', '--',
+  '+=', '-=', '*=', '/='
+]);
