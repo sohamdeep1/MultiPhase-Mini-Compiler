@@ -35,3 +35,14 @@ function parser(tokens) {
   function isType() {
     return ['int','float','string','bool','void','char'].indexOf(peek().value) !== -1;
   }
+
+  // --- Program ---
+  function parseProgram() {
+    var node = { type: 'Program', children: [] };
+    while (peek().type !== 'EOF') {
+      var decl = parseDeclaration();
+      if (decl) node.children.push(decl);
+      else consume();
+    }
+    return node;
+  }
