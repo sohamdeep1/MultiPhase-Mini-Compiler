@@ -25,3 +25,13 @@ function parser(tokens) {
     }
     return consume();
   }
+  
+  function match(type, val) {
+    var t = peek();
+    if ((type ? t.type === type : true) && (val ? t.value === val : true)) { consume(); return true; }
+    return false;
+  }
+
+  function isType() {
+    return ['int','float','string','bool','void','char'].indexOf(peek().value) !== -1;
+  }
