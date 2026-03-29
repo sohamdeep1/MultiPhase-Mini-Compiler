@@ -215,3 +215,28 @@ function parser(tokens) {
     return parsePostfix();
   }
 
+
+  function parsePostfix() {
+    var node = parsePrimary();
+    while (true) {
+      if (peek().value === '(') {
+        consume();
+        var args = [];
+        while (peek().value !== ')' && peek().type !== 'EOF') {
+          args.push(parseExpr());
+          if (peek().value === ',') consume();
+        }
+        consume();
+        node = { type: 'CallExpr', callee: node, args: args };
+      } else if (peek().value === '[') {
+        consume();
+        var index = parseExpr();
+        consume();
+        node = { type: 'IndexExpr', obj: node, index: index };
+      } else {
+        break;
+      }
+    }
+    return node;
+  }
+
