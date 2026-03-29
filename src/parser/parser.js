@@ -189,4 +189,29 @@ function parser(tokens) {
     return l;
   }
 
+  function parseComparison() {
+    var l = parseAddition();
+    while (['<','>','<=','>='].indexOf(peek().value) !== -1) { var op = consume().value; l = { type:'BinOp', op:op, left:l, right:parseAddition() }; }
+    return l;
+  }
+
+  function parseAddition() {
+    var l = parseMultiplication();
+    while (peek().value === '+' || peek().value === '-') { var op = consume().value; l = { type:'BinOp', op:op, left:l, right:parseMultiplication() }; }
+    return l;
+  }
+
+  function parseMultiplication() {
+    var l = parseUnary();
+    while (['*','/','%'].indexOf(peek().value) !== -1) { var op = consume().value; l = { type:'BinOp', op:op, left:l, right:parseUnary() }; }
+    return l;
+  }
+
+  function parseUnary() {
+    if (['!','-','++','--'].indexOf(peek().value) !== -1) {
+      var op = consume().value;
+      return { type: 'UnaryOp', op: op, operand: parseUnary() };
+    }
+    return parsePostfix();
+  }
 
