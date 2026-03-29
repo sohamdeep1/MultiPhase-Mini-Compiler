@@ -46,3 +46,13 @@ function parser(tokens) {
     }
     return node;
   }
+  
+  function parseDeclaration() {
+    if (isType()) {
+      var retType = consume().value;
+      var name = peek().type === 'IDENTIFIER' ? consume().value : '?';
+      if (peek().value === '(') return parseFunctionDecl(retType, name);
+      return parseVarDeclRest(retType, name);
+    }
+    return parseStatement();
+  }
