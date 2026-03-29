@@ -114,3 +114,21 @@ function parser(tokens) {
     return { type: 'ExprStmt', expr: expr };
   }
 
+  function parseIf() {
+    consume();
+    var node = { type: 'IfStmt', cond: null, then: null, else: null };
+    expect('PUNCTUATION', '('); node.cond = parseExpr(); expect('PUNCTUATION', ')');
+    node.then = parseStatement();
+    if (peek().value === 'else') { consume(); node.else = parseStatement(); }
+    return node;
+  }
+
+  function parseWhile() {
+    consume();
+    var node = { type: 'WhileStmt', cond: null, body: null };
+    expect('PUNCTUATION', '('); node.cond = parseExpr(); expect('PUNCTUATION', ')');
+    node.body = parseStatement();
+    return node;
+  }
+
+
