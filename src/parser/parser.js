@@ -240,3 +240,22 @@ function parser(tokens) {
     return node;
   }
 
+  function parsePrimary() {
+    var t = peek();
+    if (t.type === 'INTEGER')    { consume(); return { type: 'IntLiteral',    value: parseInt(t.value),   line: t.line }; }
+    if (t.type === 'FLOAT')      { consume(); return { type: 'FloatLiteral',  value: parseFloat(t.value), line: t.line }; }
+    if (t.type === 'STRING')     { consume(); return { type: 'StringLiteral', value: t.value,             line: t.line }; }
+    if (t.type === 'BOOL')       { consume(); return { type: 'BoolLiteral',   value: t.value === 'true',  line: t.line }; }
+    if (t.type === 'IDENTIFIER') { consume(); return { type: 'Identifier',    name: t.value,              line: t.line }; }
+    if (t.value === '(') {
+      consume();
+      var expr = parseExpr();
+      expect('PUNCTUATION', ')');
+      return { type: 'GroupExpr', expr: expr };
+    }
+    if (t.type !== 'EOF') { consume(); return { type: 'Unknown', value: t.value }; }
+    return { type: 'EOF' };
+  }
+
+  return { ast: parseProgram(), parseErrors: parseErrors };
+}
