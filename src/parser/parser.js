@@ -90,5 +90,27 @@ function parser(tokens) {
     expect('PUNCTUATION', '}');
     return node;
   }
-
+  
+  function parseStatement() {
+    var t = peek();
+    if (isType()) {
+      var typ = consume().value;
+      var nm  = peek().type === 'IDENTIFIER' ? consume().value : '?';
+      return parseVarDeclRest(typ, nm);
+    }
+    if (t.value === 'if')       return parseIf();
+    if (t.value === 'while')    return parseWhile();
+    if (t.value === 'for')      return parseFor();
+    if (t.value === 'return')   return parseReturn();
+    if (t.value === 'print')    return parsePrint();
+    if (t.value === '{')        return parseBlock();
+    if (t.value === 'break' || t.value === 'continue') {
+      var node = { type: consume().value };
+      match('PUNCTUATION', ';');
+      return node;
+    }
+    var expr = parseExpr();
+    match('PUNCTUATION', ';');
+    return { type: 'ExprStmt', expr: expr };
+  }
 
