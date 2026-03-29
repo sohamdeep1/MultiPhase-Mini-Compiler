@@ -72,3 +72,10 @@ function parser(tokens) {
     return node;
   }
 
+  function parseVarDeclRest(typeName, name) {
+    var node = { type: 'VarDecl', typeName: typeName, name: name, init: null, line: peek().line };
+    if (match('OPERATOR', '=')) node.init = parseExpr();
+    match('PUNCTUATION', ';');
+    return node;
+  }
+
