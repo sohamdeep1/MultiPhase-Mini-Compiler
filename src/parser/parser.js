@@ -56,3 +56,19 @@ function parser(tokens) {
     }
     return parseStatement();
   }
+
+  // --- Declarations ---
+  function parseFunctionDecl(retType, name) {
+    var node = { type: 'FunctionDecl', name: name, retType: retType, params: [], body: null };
+    expect('PUNCTUATION', '(');
+    while (peek().value !== ')' && peek().type !== 'EOF') {
+      if (peek().value === ',') { consume(); continue; }
+      var pType = consume().value;
+      var pName = peek().type === 'IDENTIFIER' ? consume().value : '?';
+      node.params.push({ type: 'Param', pType: pType, pName: pName });
+    }
+    expect('PUNCTUATION', ')');
+    if (peek().value === '{') node.body = parseBlock();
+    return node;
+  }
+
