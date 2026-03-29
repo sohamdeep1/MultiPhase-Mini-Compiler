@@ -151,4 +151,42 @@ function parser(tokens) {
     return node;
   }
 
+  function parsePrint() {
+    consume();
+    var node = { type: 'PrintStmt', arg: null };
+    expect('PUNCTUATION', '('); node.arg = parseExpr(); expect('PUNCTUATION', ')');
+    match('PUNCTUATION', ';');
+    return node;
+  }
+
+  // --- Expressions (precedence climbing) ---
+  function parseExpr()   { return parseAssign(); }
+
+  function parseAssign() {
+    var left = parseOr();
+    if (peek().type === 'OPERATOR' && ['=','+=','-=','*=','/='].indexOf(peek().value) !== -1) {
+      var op = consume().value;
+      return { type: 'Assign', op: op, left: left, right: parseAssign() };
+    }
+    return left;
+  }
+
+  function parseOr() {
+    var l = parseAnd();
+    while (peek().value === '||') { var op = consume().value; l = { type:'BinOp', op:op, left:l, right:parseAnd() }; }
+    return l;
+  }
+
+  function parseAnd() {
+    var l = parseEquality();
+    while (peek().value === '&&') { var op = consume().value; l = { type:'BinOp', op:op, left:l, right:parseEquality() }; }
+    return l;
+  }
+
+  function parseEquality() {
+    var l = parseComparison();
+    while (peek().value === '==' || peek().value === '!=') { var op = consume().value; l = { type:'BinOp', op:op, left:l, right:parseComparison() }; }
+    return l;
+  }
+
 
