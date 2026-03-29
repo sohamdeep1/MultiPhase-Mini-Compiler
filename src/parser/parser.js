@@ -79,3 +79,16 @@ function parser(tokens) {
     return node;
   }
 
+  // --- Statements ---
+  function parseBlock() {
+    var node = { type: 'Block', stmts: [] };
+    expect('PUNCTUATION', '{');
+    while (peek().value !== '}' && peek().type !== 'EOF') {
+      var s = parseStatement();
+      if (s) node.stmts.push(s);
+    }
+    expect('PUNCTUATION', '}');
+    return node;
+  }
+
+
