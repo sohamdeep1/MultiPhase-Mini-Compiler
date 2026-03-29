@@ -131,4 +131,24 @@ function parser(tokens) {
     return node;
   }
 
+  function parseFor() {
+    consume();
+    var node = { type: 'ForStmt', init: null, cond: null, update: null, body: null };
+    expect('PUNCTUATION', '(');
+    node.init   = parseStatement();
+    node.cond   = parseExpr(); match('PUNCTUATION', ';');
+    node.update = parseExpr();
+    expect('PUNCTUATION', ')');
+    node.body = parseStatement();
+    return node;
+  }
+
+  function parseReturn() {
+    consume();
+    var node = { type: 'ReturnStmt', value: null };
+    if (peek().value !== ';') node.value = parseExpr();
+    match('PUNCTUATION', ';');
+    return node;
+  }
+
 
