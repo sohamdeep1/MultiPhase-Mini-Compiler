@@ -46,3 +46,80 @@ function semantic(ast) {
     }
     return null;
   }
+
+  var BUILTINS = new Set(['print']);
+  var BUILTIN_FUNCS = new Map([['print', { retType: 'void', params: [{ type: 'any' }] }]]);
+
+  function checkNode(node) {
+    if (!node) return 'void';
+    switch (node.type) {
+
+      case 'Program':
+        node.children.forEach(function(c) { checkNode(c); });
+        currentScope().forEach(function(info, name) {
+          if (!info.used && !BUILTINS.has(name))
+            warnings.push({ msg: "Variable '" + name + "' declared but never used", line: info.line });
+        });
+        return 'void';
+
+      case 'FunctionDecl':
+        functions.set(node.name, { retType: node.retType, params: node.params });
+        pushScope();
+        node.params.forEach(function(p) { declareVar(p.pName, p.pType, 0); });
+        if (node.body) checkNode(node.body);
+        popScope();
+        return node.retType;
+
+      case 'Block':
+        pushScope();
+        node.stmts.forEach(function(s) { checkNode(s); });
+        popScope();
+        return 'void';
+
+      case 'VarDecl': {
+        var initType = 'unknown';
+        if (node.init) initType = resolveType(node.init);
+        if (node.init && initType !== 'unknown' && initType !== node.typeName) {
+          var ok = (node.typeName === 'float' && initType === 'int') ||
+                   (node.typeName === 'bool'  && (initType === 'int' || initType === 'bool'));
+          if (!ok) errors.push({ msg: "Type mismatch: cannot assign '" + initType + "' to '" + node.typeName + "' variable '" + node.name + "'", line: node.line });
+        }
+        declareVar(node.name, node.typeName, node.line);
+        return node.typeName;
+      }
+
+      case 'IfStmt':
+        resolveType(node.cond);
+        checkNode(node.then);
+        if (node.else) checkNode(node.else);
+        return 'void';
+
+      case 'WhileStmt':
+        resolveType(node.cond);
+        checkNode(node.body);
+        return 'void';
+
+      case 'ForStmt':
+        pushScope();
+        checkNode(node.init);
+        resolveType(node.cond);
+        resolveType(node.update);
+        checkNode(node.body);
+        popScope();
+        return 'void';
+
+      case 'ReturnStmt':
+        if (node.value) resolveType(node.value);
+        return 'void';
+
+      case 'PrintStmt':
+        resolveType(node.arg);
+        return 'void';
+
+      case 'ExprStmt':
+        return resolveType(node.expr);
+
+      default: return 'void';
+    }
+  }
+
