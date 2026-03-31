@@ -123,3 +123,46 @@ function semantic(ast) {
     }
   }
 
+  function resolveType(node) {
+    if (!node) return 'void';
+    switch (node.type) {
+      case 'IntLiteral':    return 'int';
+      case 'FloatLiteral':  return 'float';
+      case 'StringLiteral': return 'string';
+      case 'BoolLiteral':   return 'bool';
+
+      case 'Identifier': {
+        var sym = lookupVar(node.name);
+        if (!sym) { errors.push({ msg: "Undeclared variable or identifier '" + node.name + "'", line: node.line }); return 'unknown'; }
+        return sym.type;
+      }
+
+      case 'BinOp': {
+        var lt = resolveType(node.left);
+        var rt = resolveType(node.right);
+        if (['==','!=','<','>','<=','>=','&&','||'].indexOf(node.op) !== -1) return 'bool';
+        if (lt === 'float' || rt === 'float') return 'float';
+        if (lt === 'int'   && rt === 'int')   return 'int';
+        return 'unknown';
+      }
+
+      case 'UnaryOp':   return resolveType(node.operand);
+      case 'Assign':    return resolveType(node.right);
+      case 'GroupExpr': return resolveType(node.expr);
+
+      case 'CallExpr': {
+        var fnName = node.callee && node.callee.name;
+        if (!fnName) return 'unknown';
+        if (BUILTIN_FUNCS.has(fnName)) return BUILTIN_FUNCS.get(fnName).retType;
+        var fn = functions.get(fnName);
+        if (!fn) { errors.push({ msg: "Call to undeclared function '" + fnName + "'", line: node.line }); return 'unknown'; }
+        return fn.retType;
+      }
+
+      default: return 'unknown';
+    }
+  }
+
+  checkNode(ast);
+  return { errors: errors, warnings: warnings, symbolTable: symbolTable };
+}
