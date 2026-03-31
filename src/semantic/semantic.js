@@ -27,3 +27,13 @@ function semantic(ast) {
     });
     scopes.pop();
   }
+
+  function declareVar(name, type, line) {
+    if (currentScope().has(name)) {
+      errors.push({ msg: "Variable '" + name + "' already declared in this scope", line: line });
+    } else {
+      currentScope().set(name, { type: type, used: false, line: line });
+      symbolTable.push({ name: name, type: type, scope: scopes.length, line: line });
+    }
+  }
+
