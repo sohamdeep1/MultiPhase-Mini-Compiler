@@ -37,3 +37,12 @@ function semantic(ast) {
     }
   }
 
+  function lookupVar(name) {
+    for (var i = scopes.length - 1; i >= 0; i--) {
+      if (scopes[i].has(name)) {
+        scopes[i].get(name).used = true;
+        return scopes[i].get(name);
+      }
+    }
+    return null;
+  }
