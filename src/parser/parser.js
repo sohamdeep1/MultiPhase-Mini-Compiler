@@ -15,22 +15,24 @@
  */
 
 function parser(tokens) {
+  /* Strip comments -- they carry no structural meaning */
   var toks = tokens.filter(function(t) { return t.type !== 'COMMENT'; });
   var pos = 0;
   var parseErrors = [];
 
+  /* -- Cursor helpers -- */
   function peek(offset) { return toks[pos + (offset || 0)] || { type: 'EOF', value: '<EOF>' }; }
   function consume()    { return toks[pos++] || { type: 'EOF', value: '<EOF>' }; }
 
   function expect(type, val) {
     var t = peek();
     if ((type && t.type !== type) || (val && t.value !== val)) {
-      parseErrors.push({ msg: "Expected '" + (val || type) + "' but found '" + t.value + "'", line: t.line });
+      parseErrors.push({ msg: "Expected '" + (val || type) + "' but got '" + t.value + "'", line: t.line });
       return null;
     }
     return consume();
   }
-  
+
   function match(type, val) {
     var t = peek();
     if ((type ? t.type === type : true) && (val ? t.value === val : true)) { consume(); return true; }
@@ -41,28 +43,28 @@ function parser(tokens) {
     return ['int','float','string','bool','void','char'].indexOf(peek().value) !== -1;
   }
 
-  // --- Program ---
+  /* -- Program (top-level) -- */
   function parseProgram() {
     var node = { type: 'Program', children: [] };
     while (peek().type !== 'EOF') {
-      var decl = parseDeclaration();
-      if (decl) node.children.push(decl);
-      else consume();
+      var d = parseDeclaration();
+      if (d) node.children.push(d);
+      else consume(); /* skip unrecognised token to prevent infinite loop */
     }
     return node;
   }
-  
+
+  /* -- Declarations -- */
   function parseDeclaration() {
     if (isType()) {
       var retType = consume().value;
-      var name = peek().type === 'IDENTIFIER' ? consume().value : '?';
+      var name    = peek().type === 'IDENTIFIER' ? consume().value : '?';
       if (peek().value === '(') return parseFunctionDecl(retType, name);
       return parseVarDeclRest(retType, name);
     }
     return parseStatement();
   }
 
-  // --- Declarations ---
   function parseFunctionDecl(retType, name) {
     var node = { type: 'FunctionDecl', name: name, retType: retType, params: [], body: null };
     expect('PUNCTUATION', '(');
@@ -84,7 +86,7 @@ function parser(tokens) {
     return node;
   }
 
-  // --- Statements ---
+  /* -- Statements -- */
   function parseBlock() {
     var node = { type: 'Block', stmts: [] };
     expect('PUNCTUATION', '{');
@@ -95,7 +97,7 @@ function parser(tokens) {
     expect('PUNCTUATION', '}');
     return node;
   }
-  
+
   function parseStatement() {
     var t = peek();
     if (isType()) {
@@ -110,9 +112,9 @@ function parser(tokens) {
     if (t.value === 'print')    return parsePrint();
     if (t.value === '{')        return parseBlock();
     if (t.value === 'break' || t.value === 'continue') {
-      var node = { type: consume().value };
+      var n = { type: consume().value };
       match('PUNCTUATION', ';');
-      return node;
+      return n;
     }
     var expr = parseExpr();
     match('PUNCTUATION', ';');
@@ -120,7 +122,7 @@ function parser(tokens) {
   }
 
   function parseIf() {
-    consume();
+    consume(); /* if */
     var node = { type: 'IfStmt', cond: null, then: null, else: null };
     expect('PUNCTUATION', '('); node.cond = parseExpr(); expect('PUNCTUATION', ')');
     node.then = parseStatement();
@@ -129,7 +131,7 @@ function parser(tokens) {
   }
 
   function parseWhile() {
-    consume();
+    consume(); /* while */
     var node = { type: 'WhileStmt', cond: null, body: null };
     expect('PUNCTUATION', '('); node.cond = parseExpr(); expect('PUNCTUATION', ')');
     node.body = parseStatement();
@@ -137,11 +139,11 @@ function parser(tokens) {
   }
 
   function parseFor() {
-    consume();
+    consume(); /* for */
     var node = { type: 'ForStmt', init: null, cond: null, update: null, body: null };
     expect('PUNCTUATION', '(');
     node.init   = parseStatement();
-    node.cond   = parseExpr(); match('PUNCTUATION', ';');
+    node.cond   = parseExpr();  match('PUNCTUATION', ';');
     node.update = parseExpr();
     expect('PUNCTUATION', ')');
     node.body = parseStatement();
@@ -149,7 +151,7 @@ function parser(tokens) {
   }
 
   function parseReturn() {
-    consume();
+    consume(); /* return */
     var node = { type: 'ReturnStmt', value: null };
     if (peek().value !== ';') node.value = parseExpr();
     match('PUNCTUATION', ';');
@@ -157,15 +159,15 @@ function parser(tokens) {
   }
 
   function parsePrint() {
-    consume();
+    consume(); /* print */
     var node = { type: 'PrintStmt', arg: null };
     expect('PUNCTUATION', '('); node.arg = parseExpr(); expect('PUNCTUATION', ')');
     match('PUNCTUATION', ';');
     return node;
   }
 
-  // --- Expressions (precedence climbing) ---
-  function parseExpr()   { return parseAssign(); }
+  /* -- Expressions (precedence climbing via recursive descent) -- */
+  function parseExpr() { return parseAssign(); }
 
   function parseAssign() {
     var left = parseOr();
@@ -220,7 +222,6 @@ function parser(tokens) {
     return parsePostfix();
   }
 
-
   function parsePostfix() {
     var node = parsePrimary();
     while (true) {
@@ -235,12 +236,10 @@ function parser(tokens) {
         node = { type: 'CallExpr', callee: node, args: args };
       } else if (peek().value === '[') {
         consume();
-        var index = parseExpr();
+        var idx = parseExpr();
         consume();
-        node = { type: 'IndexExpr', obj: node, index: index };
-      } else {
-        break;
-      }
+        node = { type: 'IndexExpr', obj: node, index: idx };
+      } else break;
     }
     return node;
   }
@@ -251,7 +250,7 @@ function parser(tokens) {
     if (t.type === 'FLOAT')      { consume(); return { type: 'FloatLiteral',  value: parseFloat(t.value), line: t.line }; }
     if (t.type === 'STRING')     { consume(); return { type: 'StringLiteral', value: t.value,             line: t.line }; }
     if (t.type === 'BOOL')       { consume(); return { type: 'BoolLiteral',   value: t.value === 'true',  line: t.line }; }
-    if (t.type === 'IDENTIFIER') { consume(); return { type: 'Identifier',    name: t.value,              line: t.line }; }
+    if (t.type === 'IDENTIFIER') { consume(); return { type: 'Identifier',    name:  t.value,             line: t.line }; }
     if (t.value === '(') {
       consume();
       var expr = parseExpr();
