@@ -301,3 +301,9 @@ html, body {
 @keyframes progressAnim { to { width: 100%; } }
 @keyframes fadeSlide    { from { opacity:0; transform:translateY(4px); } to { opacity:1; transform:translateY(0); } }
 .fade-in { animation: fadeSlide 0.15s ease forwards; }
+
+/* ── 8. Scrollbar ── */
+::-webkit-scrollbar       { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #2a3038; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #3d4450; }
