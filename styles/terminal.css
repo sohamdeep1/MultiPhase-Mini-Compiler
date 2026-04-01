@@ -264,3 +264,35 @@ html, body {
 .t-temp    { color: var(--orange); }
 .t-ir      { color: var(--blue); font-weight: 700; }
 
+/* Boxed output blocks (IR functions, etc.) */
+.t-box      { border: 1px solid var(--border); border-radius: 4px; margin: 6px 0; overflow: hidden; }
+.t-box-head { background: var(--bg3); padding: 4px 12px; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: #4a525a; border-bottom: 1px solid var(--border); }
+.t-box-body { padding: 8px 12px; }
+
+/* Horizontal progress bar (used during compile phases) */
+.progress-bar  { height: 2px; background: var(--bg3); border-radius: 1px; overflow: hidden; margin: 4px 0; }
+.progress-fill { height: 100%; background: var(--green); border-radius: 1px; animation: progressAnim 0.4s ease forwards; width: 0%; }
+
+/* Token distribution bar chart */
+.t-bar-row   { display: flex; align-items: center; gap: 8px; margin: 2px 0; }
+.t-bar-label { width: 72px; text-align: right; font-size: 11px; }
+.t-bar-track { flex: 1; height: 8px; background: var(--bg3); border-radius: 2px; overflow: hidden; }
+.t-bar-fill  { height: 100%; border-radius: 2px; transition: width 0.4s ease; }
+.t-bar-count { width: 28px; text-align: right; font-size: 11px; color: #4a525a; }
+
+/* AST tree */
+.t-tree-node { display: flex; align-items: center; gap: 6px; line-height: 1.7; }
+.t-node-tag  { font-size: 10px; font-weight: 700; padding: 0 6px; border-radius: 3px; }
+
+/* Scope visualizer blocks */
+.t-scope-block { border-left: 2px solid; margin: 3px 0; padding: 4px 0 4px 12px; }
+
+/* Algorithm pattern cards */
+.t-algo-block { background: var(--bg3); border: 1px solid var(--border); border-radius: 4px; padding: 10px 14px; margin: 6px 0; }
+.t-algo-head  { display: flex; align-items: center; gap: 8px; margin-bottom: 5px; }
+.t-algo-badge { font-size: 10px; font-weight: 700; padding: 1px 7px; border-radius: 3px; }
+.t-algo-desc  { color: #6a737d; font-size: 11px; line-height: 1.6; margin-bottom: 6px; }
+.t-algo-meta  { display: flex; gap: 10px; font-size: 10px; color: #4a525a; }
+
+/* Horizontal rule divider */
+.t-divider { border: none; border-top: 1px solid var(--border); margin: 10px 0; }
