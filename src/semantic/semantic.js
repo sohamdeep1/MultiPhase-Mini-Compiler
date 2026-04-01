@@ -20,12 +20,14 @@ function semantic(ast) {
   var errors      = [];
   var warnings    = [];
   var symbolTable = [];
-  var scopes      = [new Map()];
-  var functions   = new Map();
+  var scopes      = [new Map()]; /* scope stack; index 0 = global */
+  var functions   = new Map();  /* declared functions: name -> {retType, params} */
 
+  /* -- Scope helpers -- */
   function currentScope() { return scopes[scopes.length - 1]; }
   function pushScope()    { scopes.push(new Map()); }
   function popScope() {
+    /* Report unused variables before discarding the scope */
     currentScope().forEach(function(info, name) {
       if (!info.used && !BUILTINS.has(name)) {
         warnings.push({ msg: "Variable '" + name + "' declared but never used", line: info.line });
@@ -46,22 +48,27 @@ function semantic(ast) {
   function lookupVar(name) {
     for (var i = scopes.length - 1; i >= 0; i--) {
       if (scopes[i].has(name)) {
-        scopes[i].get(name).used = true;
+        scopes[i].get(name).used = true; /* mark as used */
         return scopes[i].get(name);
       }
     }
     return null;
   }
 
+  /* -- Built-ins -- */
   var BUILTINS = new Set(['print']);
-  var BUILTIN_FUNCS = new Map([['print', { retType: 'void', params: [{ type: 'any' }] }]]);
+  var BUILTIN_FUNCS = new Map([
+    ['print', { retType: 'void', params: [{ type: 'any' }] }]
+  ]);
 
+  /* -- Node checker (statements and declarations) -- */
   function checkNode(node) {
     if (!node) return 'void';
     switch (node.type) {
 
       case 'Program':
         node.children.forEach(function(c) { checkNode(c); });
+        /* Check global-scope unused vars */
         currentScope().forEach(function(info, name) {
           if (!info.used && !BUILTINS.has(name))
             warnings.push({ msg: "Variable '" + name + "' declared but never used", line: info.line });
@@ -86,24 +93,20 @@ function semantic(ast) {
         var initType = 'unknown';
         if (node.init) initType = resolveType(node.init);
         if (node.init && initType !== 'unknown' && initType !== node.typeName) {
+          /* Allow implicit widening: int -> float, int/bool -> bool */
           var ok = (node.typeName === 'float' && initType === 'int') ||
                    (node.typeName === 'bool'  && (initType === 'int' || initType === 'bool'));
-          if (!ok) errors.push({ msg: "Type mismatch: cannot assign '" + initType + "' to '" + node.typeName + "' variable '" + node.name + "'", line: node.line });
+          if (!ok) errors.push({
+            msg:  "Type mismatch: cannot assign '" + initType + "' to '" + node.typeName + "' variable '" + node.name + "'",
+            line: node.line
+          });
         }
         declareVar(node.name, node.typeName, node.line);
         return node.typeName;
       }
 
-      case 'IfStmt':
-        resolveType(node.cond);
-        checkNode(node.then);
-        if (node.else) checkNode(node.else);
-        return 'void';
-
-      case 'WhileStmt':
-        resolveType(node.cond);
-        checkNode(node.body);
-        return 'void';
+      case 'IfStmt':    resolveType(node.cond); checkNode(node.then); if (node.else) checkNode(node.else); return 'void';
+      case 'WhileStmt': resolveType(node.cond); checkNode(node.body); return 'void';
 
       case 'ForStmt':
         pushScope();
@@ -114,21 +117,14 @@ function semantic(ast) {
         popScope();
         return 'void';
 
-      case 'ReturnStmt':
-        if (node.value) resolveType(node.value);
-        return 'void';
-
-      case 'PrintStmt':
-        resolveType(node.arg);
-        return 'void';
-
-      case 'ExprStmt':
-        return resolveType(node.expr);
-
-      default: return 'void';
+      case 'ReturnStmt': if (node.value) resolveType(node.value); return 'void';
+      case 'PrintStmt':  resolveType(node.arg); return 'void';
+      case 'ExprStmt':   return resolveType(node.expr);
+      default:           return 'void';
     }
   }
 
+  /* -- Type resolver (expressions -> inferred type string) -- */
   function resolveType(node) {
     if (!node) return 'void';
     switch (node.type) {
@@ -139,7 +135,10 @@ function semantic(ast) {
 
       case 'Identifier': {
         var sym = lookupVar(node.name);
-        if (!sym) { errors.push({ msg: "Undeclared variable or identifier '" + node.name + "'", line: node.line }); return 'unknown'; }
+        if (!sym) {
+          errors.push({ msg: "Undeclared variable '" + node.name + "'", line: node.line });
+          return 'unknown';
+        }
         return sym.type;
       }
 
@@ -161,7 +160,10 @@ function semantic(ast) {
         if (!fnName) return 'unknown';
         if (BUILTIN_FUNCS.has(fnName)) return BUILTIN_FUNCS.get(fnName).retType;
         var fn = functions.get(fnName);
-        if (!fn) { errors.push({ msg: "Call to undeclared function '" + fnName + "'", line: node.line }); return 'unknown'; }
+        if (!fn) {
+          errors.push({ msg: "Undeclared function '" + fnName + "'", line: node.line });
+          return 'unknown';
+        }
         return fn.retType;
       }
 
