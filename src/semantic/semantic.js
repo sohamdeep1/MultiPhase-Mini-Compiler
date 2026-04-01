@@ -2,12 +2,18 @@
  * src/semantic/semantic.js
  * Phase 3 -- Semantic Analysis
  *
- * Performs:
+ * Walks the AST and performs:
  *   1. Scope-aware symbol table construction
  *   2. Undeclared variable / function detection
  *   3. Type compatibility checking
  *   4. Duplicate declaration detection
  *   5. Unused variable warnings
+ *
+ * Usage:
+ *   var result = semantic(ast);
+ *   result.errors      -- array of {msg, line}
+ *   result.warnings    -- array of {msg, line}
+ *   result.symbolTable -- array of {name, type, scope, line}
  */
 
 function semantic(ast) {
