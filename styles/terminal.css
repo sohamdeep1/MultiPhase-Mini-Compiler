@@ -1,0 +1,16 @@
+/*
+ * styles/terminal.css
+ * All visual styles for the terminal compiler UI
+ *
+ * Sections:
+ *   1. CSS variables and reset
+ *   2. Window chrome (titlebar + traffic lights)
+ *   3. Workspace split layout
+ *   4. Left pane  -- code editor
+ *   5. Right pane -- terminal output and input
+ *   6. Terminal output primitives (lines, bars, trees, cards)
+ *   7. Animations
+ *   8. Scrollbar
+ */
+
+ 
