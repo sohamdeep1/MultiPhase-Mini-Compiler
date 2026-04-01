@@ -12,5 +12,39 @@
  *   7. Animations
  *   8. Scrollbar
  */
-
  
+/* ── 1. Variables and reset ── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:        #0c0e0f;
+  --bg2:       #111416;
+  --bg3:       #161a1b;
+  --border:    #1e2326;
+  --green:     #4ec9b0;
+  --green2:    #73d9a2;
+  --yellow:    #dcdcaa;
+  --blue:      #569cd6;
+  --purple:    #c586c0;
+  --orange:    #ce9178;
+  --red:       #f44747;
+  --amber:     #ffcc02;
+  --cyan:      #4fc1ff;
+  --white:     #d4d4d4;
+  --dim:       #6a9955;
+  --selection: rgba(78,201,176,0.25);
+  --font:      'JetBrains Mono', monospace;
+}
+
+html, body {
+  height: 100%;
+  background: var(--bg);
+  color: var(--white);
+  font-family: var(--font);
+  font-size: 13px;
+  line-height: 1.6;
+  overflow: hidden;
+}
+
+
+
