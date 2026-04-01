@@ -235,3 +235,32 @@ html, body {
 #cmd-input::selection   { background: var(--selection); }
 #cmd-input::placeholder { color: #3d4450; }
 
+/* ── 6. Terminal output primitives ── */
+
+/* Generic line */
+.t-line    { line-height: 1.6; white-space: pre-wrap; word-break: break-word; }
+.t-blank   { height: 6px; }
+
+/* Echoed command row */
+.t-cmd      { display: flex; align-items: flex-start; gap: 8px; margin-bottom: 2px; }
+.t-cmd .pmt { color: var(--green); font-weight: 700; flex-shrink: 0; }
+.t-cmd .txt { color: var(--white); }
+
+/* Semantic colour tokens */
+.t-ok      { color: var(--green2); }
+.t-err     { color: var(--red); }
+.t-warn    { color: var(--amber); }
+.t-info    { color: var(--cyan); }
+.t-dim     { color: #4a525a; }
+.t-head    { color: var(--yellow); font-weight: 700; }
+.t-kw      { color: var(--blue); }
+.t-ident   { color: var(--cyan); }
+.t-lit     { color: var(--orange); }
+.t-op      { color: var(--white); }
+.t-punct   { color: #7a8897; }
+.t-comment { color: var(--dim); font-style: italic; }
+.t-type    { color: var(--purple); }
+.t-label   { color: var(--amber); }
+.t-temp    { color: var(--orange); }
+.t-ir      { color: var(--blue); font-weight: 700; }
+
