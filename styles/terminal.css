@@ -296,3 +296,8 @@ html, body {
 
 /* Horizontal rule divider */
 .t-divider { border: none; border-top: 1px solid var(--border); margin: 10px 0; }
+
+/* ── 7. Animations ── */
+@keyframes progressAnim { to { width: 100%; } }
+@keyframes fadeSlide    { from { opacity:0; transform:translateY(4px); } to { opacity:1; transform:translateY(0); } }
+.fade-in { animation: fadeSlide 0.15s ease forwards; }
