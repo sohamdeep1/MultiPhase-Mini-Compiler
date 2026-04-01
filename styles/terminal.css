@@ -83,5 +83,11 @@ html, body {
   letter-spacing: 0.5px;
 }
 
+/* ── 3. Workspace split ── */
+.workspace {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+}
 
 
