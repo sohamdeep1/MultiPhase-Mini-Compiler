@@ -2,11 +2,16 @@
  * src/parser/parser.js
  * Phase 2 -- Syntax Analysis (Recursive Descent Parser)
  *
- * Builds an Abstract Syntax Tree (AST) from the token stream.
+ * Consumes a token stream and builds an Abstract Syntax Tree (AST).
  *
- * Precedence (low to high):
+ * Expression precedence (low to high):
  *   assign -> or -> and -> equality -> comparison
  *   -> addition -> multiplication -> unary -> postfix -> primary
+ *
+ * Usage:
+ *   var result = parser(tokens);
+ *   result.ast         -- the root Program node
+ *   result.parseErrors -- array of {msg, line} for parse failures
  */
 
 function parser(tokens) {
