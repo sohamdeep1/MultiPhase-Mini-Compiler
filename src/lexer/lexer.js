@@ -13,56 +13,54 @@
  *   var tokens = lexer(sourceString);
  */
 
-/* Token Type Definitions */
+/* Token type descriptors used by the renderer */
 var TOKEN_TYPES = {
-  KEYWORD:     { label: 'KEYWORD',   color: '#a855f7', bg: 'rgba(168,85,247,0.12)' },
-  IDENTIFIER:  { label: 'IDENT',     color: '#60a5fa', bg: 'rgba(96,165,250,0.12)' },
-  INTEGER:     { label: 'INT_LIT',   color: '#4ade80', bg: 'rgba(74,222,128,0.12)' },
-  FLOAT:       { label: 'FLOAT_LIT', color: '#34d399', bg: 'rgba(52,211,153,0.12)' },
-  STRING:      { label: 'STR_LIT',   color: '#f59e0b', bg: 'rgba(245,158,11,0.12)' },
-  BOOL:        { label: 'BOOL_LIT',  color: '#f472b6', bg: 'rgba(244,114,182,0.12)' },
-  OPERATOR:    { label: 'OPERATOR',  color: '#fb923c', bg: 'rgba(251,146,60,0.12)' },
-  PUNCTUATION: { label: 'PUNCT',     color: '#94a3b8', bg: 'rgba(148,163,184,0.12)' },
-  COMMENT:     { label: 'COMMENT',   color: '#64748b', bg: 'rgba(100,116,139,0.12)' },
-  EOF:         { label: 'EOF',       color: '#475569', bg: 'rgba(71,85,105,0.08)'  },
-  UNKNOWN:     { label: 'UNKNOWN',   color: '#f87171', bg: 'rgba(248,113,113,0.12)' },
+  KEYWORD:     { label: 'KEYWORD',   color: '#569cd6' },
+  IDENTIFIER:  { label: 'IDENT',     color: '#4fc1ff' },
+  INTEGER:     { label: 'INT_LIT',   color: '#b5cea8' },
+  FLOAT:       { label: 'FLOAT_LIT', color: '#b5cea8' },
+  STRING:      { label: 'STR_LIT',   color: '#ce9178' },
+  BOOL:        { label: 'BOOL_LIT',  color: '#c586c0' },
+  OPERATOR:    { label: 'OPERATOR',  color: '#d4d4d4' },
+  PUNCTUATION: { label: 'PUNCT',     color: '#7a8897' },
+  COMMENT:     { label: 'COMMENT',   color: '#6a9955' },
+  EOF:         { label: 'EOF',       color: '#3d4450' },
+  UNKNOWN:     { label: 'UNKNOWN',   color: '#f44747' },
 };
 
-/* Language Definition */
+/* Language keyword, operator, and punctuation sets */
 var KEYWORDS = new Set([
-  'int', 'float', 'string', 'bool', 'void', 'char',
-  'if', 'else', 'while', 'for', 'return', 'print',
-  'true', 'false', 'break', 'continue', 'null'
+  'int','float','string','bool','void','char',
+  'if','else','while','for','return','print',
+  'true','false','break','continue','null'
 ]);
 
 var OPERATORS = new Set([
-  '+', '-', '*', '/', '%',
-  '=', '==', '!=',
-  '<', '>', '<=', '>=',
-  '&&', '||', '!',
-  '++', '--',
-  '+=', '-=', '*=', '/='
+  '+','-','*','/','%',
+  '=','==','!=','<','>','<=','>=',
+  '&&','||','!','++','--',
+  '+=','-=','*=','/='
 ]);
 
-var PUNCTUATIONS = new Set([
-  '{', '}', '(', ')', '[', ']',
-  ';', ',', '.', ':', '->'
-]);
+var PUNCTUATIONS = new Set(['{','}','(',')','[',']',';',',','.','->']);
 
 var MULTI_CHAR_OPS = [
-  '==', '!=', '<=', '>=',
-  '&&', '||',
-  '++', '--',
-  '+=', '-=', '*=', '/=',
-  '->'
+  '==','!=','<=','>=','&&','||',
+  '++','--','+=','-=','*=','/=','->'
 ];
 
-/* Lexer */
+/**
+ * lexer(source) -> Token[]
+ *
+ * Scans the source string left-to-right and emits tokens.
+ * Whitespace is silently skipped.
+ * Comments (// and block) are captured as COMMENT tokens.
+ */
 function lexer(source) {
   var tokens = [];
   var i = 0, line = 1, col = 1;
 
-  function peek(offset)   { offset = offset || 0; return source[i + offset]; }
+  function peek(offset) { return source[i + (offset || 0)]; }
   function advance() {
     var ch = source[i++];
     if (ch === '\n') { line++; col = 1; } else { col++; }
@@ -73,7 +71,7 @@ function lexer(source) {
     var startLine = line, startCol = col;
     var ch = peek();
 
-    // Single-line comment
+    // Single-line comment //
     if (ch === '/' && peek(1) === '/') {
       var val = '';
       while (i < source.length && peek() !== '\n') val += advance();
@@ -81,20 +79,20 @@ function lexer(source) {
       continue;
     }
 
-    // Block comment (slash-star to star-slash)
+    // Block comment (slash-star ... star-slash)
     if (ch === '/' && peek(1) === '*') {
-      var val = '';
       advance(); advance();
+      var val = '';
       while (i < source.length && !(peek() === '*' && peek(1) === '/')) val += advance();
       if (i < source.length) { advance(); advance(); }
       tokens.push({ type: 'COMMENT', value: val.trim(), line: startLine, col: startCol });
       continue;
     }
 
-    // Whitespace -- skip
+    // Whitespace -- silently skip
     if (/\s/.test(ch)) { advance(); continue; }
 
-    // String literal
+    // String literal "..."
     if (ch === '"') {
       advance();
       var val = '';
@@ -107,7 +105,7 @@ function lexer(source) {
       continue;
     }
 
-    // Numeric literal
+    // Numeric literal (integer or float)
     if (/[0-9]/.test(ch)) {
       var val = '';
       while (i < source.length && /[0-9]/.test(peek())) val += advance();
@@ -121,20 +119,20 @@ function lexer(source) {
       continue;
     }
 
-    // Identifier / keyword / boolean
+    // Identifier, keyword, or boolean literal
     if (/[a-zA-Z_]/.test(ch)) {
       var val = '';
       while (i < source.length && /[a-zA-Z0-9_]/.test(peek())) val += advance();
       if (val === 'true' || val === 'false')
-        tokens.push({ type: 'BOOL', value: val, line: startLine, col: startCol });
+        tokens.push({ type: 'BOOL',       value: val, line: startLine, col: startCol });
       else if (KEYWORDS.has(val))
-        tokens.push({ type: 'KEYWORD', value: val, line: startLine, col: startCol });
+        tokens.push({ type: 'KEYWORD',    value: val, line: startLine, col: startCol });
       else
         tokens.push({ type: 'IDENTIFIER', value: val, line: startLine, col: startCol });
       continue;
     }
 
-    // Multi-character operators
+    // Multi-character operators (==, !=, <=, >=, &&, ||, ++, --, +=, etc.)
     var twoChar = source.substr(i, 2);
     if (MULTI_CHAR_OPS.indexOf(twoChar) !== -1) {
       tokens.push({ type: 'OPERATOR', value: twoChar, line: startLine, col: startCol });
@@ -156,7 +154,7 @@ function lexer(source) {
       continue;
     }
 
-    // Unknown character
+    // Unknown / unrecognised character
     tokens.push({ type: 'UNKNOWN', value: ch, line: startLine, col: startCol });
     advance();
   }
