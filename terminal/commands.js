@@ -161,3 +161,71 @@ var COMMANDS = {
     printNode(_ast, '', true, 0);
   },
 
+  /* -- semantic -- */
+  semantic: function() {
+    needCompiled(); if (!compiled) return;
+
+    tline('Semantic Analysis Report', 't-head');
+    blank();
+
+    if (_sem.errors.length === 0 && _sem.warnings.length === 0) {
+      tline('  No errors or warnings -- program is type-safe.', 't-ok');
+    }
+    _sem.errors.forEach(function(e) {
+      tline('  [ERROR]  ' + e.msg + (e.line ? '  (line ~' + e.line + ')' : ''), 't-err');
+    });
+    _sem.warnings.forEach(function(w) {
+      tline('  [WARN]   ' + w.msg + (w.line ? '  (line ~' + w.line + ')' : ''), 't-warn');
+    });
+
+    blank();
+
+    /* Scope tree */
+    tline('Scope Tree:', 't-dim');
+    var scopes = buildScopeData(_ast);
+    var scopeHtml = '<div style="padding-left:4px">' +
+      '<div class="t-scope-block" style="border-color:#3d4450">' +
+        '<span class="t-dim">scope[0]</span> <span class="t-kw">global</span>' +
+      '</div>';
+
+    scopes.forEach(function(s) {
+      var indent = s.depth * 16;
+      var varBadges = s.vars.map(function(v) {
+        return '<span class="t-type">' + v.type + '</span> <span class="t-ident">' + esc(v.name) + '</span>';
+      }).join(', ');
+
+      scopeHtml +=
+        '<div class="t-scope-block" style="border-color:' + s.color + ';margin-left:' + indent + 'px">' +
+          '<span style="color:' + s.color + ';font-size:10px;font-weight:700">scope[' + s.depth + ']</span> ' +
+          '<span style="color:#dcdcaa">' + esc(s.label) + '</span>' +
+          (s.vars.length ? ' <span class="t-dim">--</span> ' + varBadges : '') +
+        '</div>';
+    });
+
+    scopeHtml += '</div>';
+    out(scopeHtml);
+    blank();
+
+    /* Symbol table */
+    tline('Symbol Table:', 't-dim');
+    out('<div class="t-line">' +
+      '<span style="color:#3d4450;display:inline-block;width:120px">NAME</span>' +
+      '<span style="display:inline-block;width:80px;color:#3d4450">TYPE</span>' +
+      '<span style="display:inline-block;width:90px;color:#3d4450">SCOPE</span>' +
+      '<span style="color:#3d4450">LINE</span>' +
+    '</div>');
+
+    _sem.symbolTable.forEach(function(s) {
+      var tc = s.type === 'int'    ? '#b5cea8' :
+               s.type === 'float'  ? '#4ec9b0' :
+               s.type === 'string' ? '#ce9178' :
+               s.type === 'bool'   ? '#c586c0' : '#6a737d';
+      out('<div class="t-line">' +
+        '<span class="t-ident" style="display:inline-block;width:120px">' + esc(s.name) + '</span>' +
+        '<span style="display:inline-block;width:80px;color:' + tc + '">' + s.type + '</span>' +
+        '<span style="display:inline-block;width:90px;color:#4a525a">' + (s.scope <= 1 ? 'global' : 'depth ' + s.scope) + '</span>' +
+        '<span style="color:#3d4450">' + (s.line ? 'L' + s.line : '-') + '</span>' +
+      '</div>');
+    });
+  },
+
