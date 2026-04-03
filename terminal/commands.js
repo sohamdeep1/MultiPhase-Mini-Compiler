@@ -356,3 +356,23 @@ var COMMANDS = {
     });
   },
 
+  /* -- load -- */
+  load: function(args) {
+    var name = args && args[0];
+    if (!name || !SAMPLES[name]) {
+      tline('[!] Usage: load <basic | loop | func | error>', 't-warn');
+      return;
+    }
+    document.getElementById('src').value = SAMPLES[name];
+    syncLines();
+    compiled = false;
+    setStatus('dim', 'ready');
+    tline('Loaded sample: ' + name + '  (' + SAMPLES[name].split('\n').length + ' lines)', 't-ok');
+    tline('Run "compile" to process it.', 't-dim');
+  },
+
+  /* -- clear / cls -- */
+  clear: function() { document.getElementById('output').innerHTML = ''; },
+  cls:   function() { COMMANDS.clear(); },
+
+};
