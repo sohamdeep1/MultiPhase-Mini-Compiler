@@ -153,3 +153,11 @@ var COMMANDS = {
     });
   },
 
+  /* -- parse -- */
+  parse: function() {
+    needCompiled(); if (!compiled) return;
+    tline('Abstract Syntax Tree', 't-head');
+    blank();
+    printNode(_ast, '', true, 0);
+  },
+
