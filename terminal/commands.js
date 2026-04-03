@@ -268,3 +268,91 @@ var COMMANDS = {
     });
   },
 
+  /* -- algos -- */
+  algos: function() {
+    needCompiled(); if (!compiled) return;
+
+    tline('Algorithm Pattern Detection', 't-head');
+    blank();
+
+    if (!_algos.length) {
+      tline('  No complex algorithm patterns detected.', 't-dim');
+      return;
+    }
+
+    _algos.forEach(function(a) {
+      out('<div class="t-algo-block">' +
+        '<div class="t-algo-head">' +
+          '<span style="font-weight:700;color:#d4d4d4">' + esc(a.name) + '</span>' +
+          '<span class="t-algo-badge" style="background:' + a.color + '22;color:' + a.color + '">' + a.badge + '</span>' +
+        '</div>' +
+        '<div class="t-algo-desc">' + esc(a.desc) + '</div>' +
+        '<div class="t-algo-meta">' +
+          '<span>Time: ' + a.complexity + '</span>' +
+          '<span>Space: ' + a.space + '</span>' +
+        '</div>' +
+      '</div>');
+    });
+  },
+
+  /* -- tokens (alias for lex with optional filter) -- */
+  tokens: function(args) { COMMANDS.lex(args); },
+
+  /* -- symbols (alias for semantic) -- */
+  symbols: function() {
+    if (!_sem) { tline('[!] Run compile first.', 't-warn'); return; }
+    COMMANDS.semantic();
+  },
+
+  /* -- stats -- */
+  stats: function() {
+    if (!compiled) { tline('[!] Run compile first.', 't-warn'); return; }
+
+    tline('Compilation Statistics', 't-head');
+    blank();
+
+    var vis = _tokens.filter(function(t) { return t.type !== 'EOF'; });
+    var counts = {};
+    vis.forEach(function(t) { counts[t.type] = (counts[t.type] || 0) + 1; });
+
+    var funcs = [];
+    function ff(n) {
+      if (!n) return;
+      if (n.type === 'FunctionDecl') funcs.push(n);
+      ['children','stmts'].forEach(function(k) { if (Array.isArray(n[k])) n[k].forEach(ff); });
+      if (n.body) ff(n.body);
+    }
+    ff(_ast);
+
+    var rows = [
+      ['Total tokens',          vis.length],
+      ['AST nodes',             countNodes(_ast)],
+      ['Functions declared',    funcs.length],
+      ['Symbols in table',      _sem.symbolTable.length],
+      ['Semantic errors',       _sem.errors.length],
+      ['Semantic warnings',     _sem.warnings.length],
+      ['IR instructions',       _ir.filter(function(l) { return l.trim(); }).length],
+      ['Algorithm patterns',    _algos.length],
+    ];
+
+    rows.forEach(function(r) {
+      out('<div class="t-line">' +
+        '<span style="color:#4a525a;display:inline-block;width:220px">' + r[0] + '</span>' +
+        '<span style="color:#4fc1ff;font-weight:700">' + r[1] + '</span>' +
+      '</div>');
+    });
+
+    blank();
+    tline('Token breakdown:', 't-dim');
+    var maxC = Math.max.apply(null, Object.values(counts).concat([1]));
+    Object.keys(counts).forEach(function(type) {
+      var ti  = TOKEN_TYPES[type] || TOKEN_TYPES.UNKNOWN;
+      var pct = Math.round(counts[type] / maxC * 100);
+      out('<div class="t-bar-row">' +
+        '<span class="t-bar-label" style="color:' + ti.color + '">' + ti.label + '</span>' +
+        '<div class="t-bar-track"><div class="t-bar-fill" style="width:' + pct + '%;background:' + ti.color + '"></div></div>' +
+        '<span class="t-bar-count">' + counts[type] + '</span>' +
+      '</div>');
+    });
+  },
+
