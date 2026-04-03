@@ -229,3 +229,42 @@ var COMMANDS = {
     });
   },
 
+  /* -- ir -- */
+  ir: function() {
+    needCompiled(); if (!compiled) return;
+
+    tline('3-Address Intermediate Representation', 't-head');
+    blank();
+
+    /* Group instructions into function chunks */
+    var chunks = [], current = null;
+    _ir.forEach(function(l) {
+      if (l.startsWith('FUNC ')) {
+        if (current) chunks.push(current);
+        current = { hdr: l, lines: [] };
+      } else if (l.startsWith('END_FUNC')) {
+        if (current) { current.lines.push(l); chunks.push(current); current = null; }
+      } else if (l.trim()) {
+        if (!current) current = { hdr: '// top-level', lines: [] };
+        current.lines.push(l);
+      }
+    });
+    if (current) chunks.push(current);
+
+    chunks.forEach(function(chunk) {
+      var bodyHtml = chunk.lines.map(function(l) {
+        var h = esc(l);
+        h = h.replace(/\b(DECL|RETURN|PRINT|CALL|PARAM|PARAM_GET|IF_FALSE|GOTO|END_FUNC)\b/g, '<span class="t-ir">$1</span>');
+        h = h.replace(/\b(t\d+)\b/g,                                                           '<span class="t-temp">$1</span>');
+        h = h.replace(/\b(while_\w+|endwhile_\w+|for_\w+|endfor_\w+|else_\w+|endif_\w+)\b/g,  '<span class="t-label">$1</span>');
+        h = h.replace(/\b(int|float|string|bool|void|char)\b/g,                                '<span class="t-type">$1</span>');
+        return '<div class="t-line">' + h + '</div>';
+      }).join('');
+
+      out('<div class="t-box">' +
+        '<div class="t-box-head">' + esc(chunk.hdr) + '</div>' +
+        '<div class="t-box-body">' + bodyHtml + '</div>' +
+      '</div>');
+    });
+  },
+
