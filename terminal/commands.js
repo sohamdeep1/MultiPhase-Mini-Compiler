@@ -89,3 +89,67 @@ var COMMANDS = {
     }
   },
 
+  /* -- lex -- */
+  lex: function(args) {
+    needCompiled(); if (!compiled) return;
+
+    var filter = args && args[0] ? args[0].toUpperCase() : null;
+    var vis = _tokens.filter(function(t) {
+      return t.type !== 'EOF' && (!filter || t.type === filter);
+    });
+
+    if (!vis.length) {
+      tline('No tokens' + (filter ? ' of type ' + filter : ''), 't-warn');
+      return;
+    }
+
+    tline('Tokens' + (filter ? ' [' + filter + ']' : '') + '  (' + vis.length + ' total)', 't-head');
+    blank();
+
+    /* Column header */
+    out('<div class="t-line">' +
+      '<span style="color:#3d4450;display:inline-block;width:36px">#</span>' +
+      '<span style="display:inline-block;width:180px;color:#4a525a">VALUE</span>' +
+      '<span style="display:inline-block;width:100px;color:#4a525a">TYPE</span>' +
+      '<span style="color:#4a525a">LINE</span>' +
+    '</div>');
+
+    vis.forEach(function(tok, i) {
+      var ti  = TOKEN_TYPES[tok.type] || TOKEN_TYPES.UNKNOWN;
+      var cls = tok.type === 'KEYWORD'     ? 't-kw'   :
+                tok.type === 'IDENTIFIER'  ? 't-ident':
+                tok.type === 'INTEGER' || tok.type === 'FLOAT' ? 't-lit' :
+                tok.type === 'STRING'      ? 't-lit'  :
+                tok.type === 'BOOL'        ? 't-type' :
+                tok.type === 'OPERATOR'    ? 't-op'   :
+                tok.type === 'PUNCTUATION' ? 't-punct':
+                tok.type === 'COMMENT'     ? 't-comment' : 't-err';
+
+      out('<div class="t-line">' +
+        '<span style="color:#3d4450;display:inline-block;width:36px">' + (i + 1) + '</span>' +
+        '<span class="' + cls + '" style="display:inline-block;width:180px;overflow:hidden;white-space:nowrap">' + esc(tok.value.substring(0, 22)) + '</span>' +
+        '<span style="display:inline-block;width:100px;color:' + ti.color + ';font-size:11px;font-weight:700">' + ti.label + '</span>' +
+        '<span style="color:#3d4450">' + (tok.line || '-') + '</span>' +
+      '</div>');
+    });
+
+    blank();
+
+    /* Distribution bar chart */
+    var counts = {};
+    _tokens.filter(function(t) { return t.type !== 'EOF'; })
+           .forEach(function(t) { counts[t.type] = (counts[t.type] || 0) + 1; });
+    var maxC = Math.max.apply(null, Object.values(counts).concat([1]));
+
+    tline('Distribution:', 't-dim');
+    Object.keys(counts).forEach(function(type) {
+      var ti  = TOKEN_TYPES[type] || TOKEN_TYPES.UNKNOWN;
+      var pct = Math.round(counts[type] / maxC * 100);
+      out('<div class="t-bar-row">' +
+        '<span class="t-bar-label" style="color:' + ti.color + '">' + ti.label + '</span>' +
+        '<div class="t-bar-track"><div class="t-bar-fill" style="width:' + pct + '%;background:' + ti.color + '"></div></div>' +
+        '<span class="t-bar-count">' + counts[type] + '</span>' +
+      '</div>');
+    });
+  },
+
