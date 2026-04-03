@@ -38,3 +38,54 @@ var COMMANDS = {
     blank();
     tline('Arrow Up/Down -- command history   |   Tab -- autocomplete   |   Ctrl+L -- clear', 't-dim');
   },
+
+    /* -- compile -- */
+  compile: function() {
+    var src = document.getElementById('src').value.trim();
+    if (!src) { tline('[!] Editor is empty. Write some code or: load basic', 't-err'); return; }
+
+    tline('[1/4] Lexical Analysis...', 't-info');
+    progress();
+    _tokens = lexer(src);
+    var vis = _tokens.filter(function(t) { return t.type !== 'EOF'; });
+    tline('      OK -- ' + vis.length + ' tokens produced', 't-ok');
+
+    tline('[2/4] Syntax Parsing...', 't-info');
+    progress();
+    var pr = parser(_tokens);
+    _ast = pr.ast;
+    if (pr.parseErrors.length) {
+      pr.parseErrors.forEach(function(e) { tline('      WARN: ' + e.msg, 't-warn'); });
+    } else {
+      tline('      OK -- AST built, ' + countNodes(_ast) + ' nodes', 't-ok');
+    }
+
+    tline('[3/4] Semantic Analysis...', 't-info');
+    progress();
+    _sem = semantic(_ast);
+    if (_sem.errors.length) {
+      _sem.errors.forEach(function(e) { tline('      ERR: ' + e.msg, 't-err'); });
+    } else {
+      tline('      OK -- ' + _sem.symbolTable.length + ' symbol(s), ' + _sem.warnings.length + ' warning(s)', 't-ok');
+    }
+    _sem.warnings.forEach(function(w) { tline('      WARN: ' + w.msg, 't-warn'); });
+
+    tline('[4/4] Code Generation...', 't-info');
+    progress();
+    _ir    = codeGen(_ast);
+    _algos = detectAlgorithms(_ast, _tokens);
+    var instrCount = _ir.filter(function(l) { return l.trim(); }).length;
+    tline('      OK -- ' + instrCount + ' IR instructions, ' + _algos.length + ' pattern(s)', 't-ok');
+
+    blank();
+    compiled = true;
+
+    if (_sem.errors.length) {
+      tline('Compilation finished with ' + _sem.errors.length + ' error(s).', 't-err');
+      setStatus('error', _sem.errors.length + ' error(s)');
+    } else {
+      tline('Compilation successful.  Next: lex | parse | semantic | ir | algos', 't-ok');
+      setStatus('ok', 'compiled');
+    }
+  },
+
