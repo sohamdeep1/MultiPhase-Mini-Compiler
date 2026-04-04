@@ -27,3 +27,9 @@ function syncLines() {
   document.getElementById('ef-chars').textContent = src.value.length + ' chars';
 }
 
+/**
+ * loadSample(name)
+ * Called by the sample buttons (basic / loop / func / error).
+ * Loads the named sample into the editor, echoes the action
+ * in the terminal, and resets the compiled flag.
+ */
