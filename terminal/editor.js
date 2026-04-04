@@ -33,3 +33,35 @@ function syncLines() {
  * Loads the named sample into the editor, echoes the action
  * in the terminal, and resets the compiled flag.
  */
+function loadSample(name) {
+  if (!SAMPLES[name]) return;
+  document.getElementById('src').value = SAMPLES[name];
+  syncLines();
+  compiled = false;
+  setStatus('dim', 'ready');
+  document.getElementById('cmd-input').focus();
+
+  /* Echo in terminal so the session log is self-documenting */
+  echoCmd('load ' + name);
+  blank();
+  tline('Loaded sample: ' + name + '  (' + SAMPLES[name].split('\n').length + ' lines)', 't-ok');
+  tline('Run "compile" to process it.', 't-dim');
+  blank();
+
+  var o = document.getElementById('output');
+  o.scrollTop = o.scrollHeight;
+}
+
+/* Cursor position tracker -- updates "Ln X Col Y" in the footer */
+document.getElementById('src').addEventListener('keyup', function() {
+  var val   = this.value.substring(0, this.selectionStart);
+  var lines = val.split('\n');
+  document.getElementById('ef-pos').textContent =
+    'Ln ' + lines.length + ' Col ' + (lines[lines.length - 1].length + 1);
+});
+
+/* Scroll sync -- keep line-number gutter aligned with textarea */
+document.getElementById('src').addEventListener('scroll', function() {
+  document.getElementById('lineNums').scrollTop = this.scrollTop;
+});
+
