@@ -59,3 +59,13 @@ editor.js         -- syncLines(), loadSample() (uses SAMPLES, compiled)
 boot.js           -- runs IIFE: loads sample, prints banner
 ```
 
+
+---
+
+## Compiler Phases
+
+### Phase 1 -- Lexical Analysis (`src/lexer/lexer.js`)
+Character-level scanner. Produces a flat token stream from source text.
+Token types: KEYWORD, IDENTIFIER, INT_LIT, FLOAT_LIT, STR_LIT, BOOL_LIT,
+OPERATOR, PUNCT, COMMENT, UNKNOWN, EOF.
+
