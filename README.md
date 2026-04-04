@@ -38,3 +38,24 @@ mc-terminal/
     +-- boot.js                  Startup sequence: load default sample, print banner
 ```
 
+---
+
+## Script Load Order (index.html)
+
+The browser executes scripts in this exact order -- each file depends on those above it:
+
+```
+samples.js        -- SAMPLES variable
+lexer.js          -- TOKEN_TYPES, lexer()
+parser.js         -- parser()
+semantic.js       -- semantic()
+codegen.js        -- codeGen(), detectAlgorithms()
+state.js          -- shared vars: _tokens, _ast, compiled, ...
+output.js         -- out(), tline(), blank(), echoCmd(), progress()
+helpers.js        -- countNodes(), buildScopeData(), printNode(), setStatus()
+commands.js       -- COMMANDS object (uses all of the above)
+input.js          -- handleKey() (uses COMMANDS, history, histIdx)
+editor.js         -- syncLines(), loadSample() (uses SAMPLES, compiled)
+boot.js           -- runs IIFE: loads sample, prints banner
+```
+
