@@ -16,3 +16,14 @@
  * number of lines in the textarea. Syncs scroll position.
  * Also updates the char count in the editor footer.
  */
+
+function syncLines() {
+  var src   = document.getElementById('src');
+  var gutter = document.getElementById('lineNums');
+  var count = src.value.split('\n').length;
+  var html  = '';
+  for (var i = 1; i <= count; i++) html += '<div>' + i + '</div>';
+  gutter.innerHTML = html;
+  document.getElementById('ef-chars').textContent = src.value.length + ' chars';
+}
+
