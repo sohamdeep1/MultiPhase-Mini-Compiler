@@ -9,3 +9,10 @@
  *   buildScopeData(ast)     -- build scope list for visualiser
  *   printNode(node, ...)    -- recursively print AST as a tree
  */
+
+/* -- Guard -- */
+function needCompiled() {
+  if (!compiled) {
+    tline('[!] Nothing compiled yet. Run: compile', 't-warn');
+  }
+}
