@@ -39,3 +39,32 @@ function countNodes(node) {
   return count;
 }
 
+/* -- Scope data builder -- */
+var SCOPE_COLORS = ['#4ec9b0', '#4fc1ff', '#dcdcaa', '#c586c0', '#ce9178'];
+
+function buildScopeData(ast) {
+  var scopes = [];
+
+  function walk(node, depth, parentLabel) {
+    if (!node) return;
+    var label = null, vars = [];
+
+    if (node.type === 'FunctionDecl') {
+      label = 'fn: ' + node.name + '()';
+      vars  = (node.params || []).map(function(p) { return { name: p.pName, type: p.pType }; });
+    }
+
+    if (label) {
+      /* Collect var decls directly inside this function body */
+      var stmts = node.body ? (node.body.stmts || []) : (node.stmts || []);
+      stmts.forEach(function(s) {
+        if (s && s.type === 'VarDecl') vars.push({ name: s.name, type: s.typeName });
+      });
+      scopes.push({
+        depth: depth,
+        label: label,
+        vars:  vars,
+        color: SCOPE_COLORS[Math.min(depth, SCOPE_COLORS.length - 1)]
+      });
+    }
+
