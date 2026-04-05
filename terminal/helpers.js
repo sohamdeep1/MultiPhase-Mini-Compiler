@@ -92,3 +92,31 @@ var AST_NODE_COLORS = {
   IntLiteral: '#b5cea8', FloatLiteral: '#b5cea8',
   StringLiteral: '#ce9178', BoolLiteral: '#c586c0',
 };
+
+function printNode(node, prefix, isLast, depth) {
+  if (!node || (depth || 0) > 12) return;
+
+  var color     = AST_NODE_COLORS[node.type] || '#6a737d';
+  var connector = isLast ? '`-- ' : '|-- ';
+
+  /* Inline annotation: name, type hint, operator, literal value */
+  var ann = '';
+  if (node.name)     ann += ' <span class="t-ident">' + esc(node.name) + '</span>';
+  if (node.pName)    ann += ' <span class="t-type">' + esc(node.pType) + '</span> <span class="t-ident">' + esc(node.pName) + '</span>';
+  if (node.typeName) ann += ' <span class="t-type">' + esc(node.typeName) + '</span>';
+  if (node.retType && node.type === 'FunctionDecl')
+    ann += ' <span class="t-dim">-&gt;</span> <span class="t-type">' + esc(node.retType) + '</span>';
+  if (node.op)  ann += ' <span class="t-op">' + esc(node.op) + '</span>';
+  if (node.type === 'IntLiteral' || node.type === 'FloatLiteral')
+    ann += ' <span class="t-lit">' + node.value + '</span>';
+  if (node.type === 'StringLiteral')
+    ann += ' <span class="t-lit">' + esc(node.value) + '</span>';
+  if (node.type === 'BoolLiteral')
+    ann += ' <span class="t-type">' + node.value + '</span>';
+
+  out('<div class="t-tree-node">' +
+    '<span class="t-dim">' + esc((prefix || '') + connector) + '</span>' +
+    '<span class="t-node-tag" style="background:' + color + '22;color:' + color + '">' + node.type + '</span>' +
+    ann +
+  '</div>');
+
