@@ -67,4 +67,19 @@ function buildScopeData(ast) {
         color: SCOPE_COLORS[Math.min(depth, SCOPE_COLORS.length - 1)]
       });
     }
+    
+    /* Recurse into children */
+    var nextDepth = depth + (label ? 1 : 0);
+    ['children', 'stmts', 'params'].forEach(function(key) {
+      if (Array.isArray(node[key])) node[key].forEach(function(c) { walk(c, nextDepth, label || parentLabel); });
+    });
+    if (node.body) walk(node.body, nextDepth, label || parentLabel);
+    if (node.then) walk(node.then, depth, label || parentLabel);
+    if (node.else) walk(node.else, depth, label || parentLabel);
+  }
+
+  walk(ast, 1, 'global');
+  return scopes;
+}
+
 
