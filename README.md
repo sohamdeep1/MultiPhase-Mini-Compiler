@@ -82,3 +82,9 @@ AST walker. Checks program correctness:
 - Duplicate declaration errors
 - Unused variable warnings
 
+### Phase 4 -- IR and Algorithm Mapping (`src/codegen/codegen.js`)
+Two outputs:
+- 3-Address Code (TAC): temps t1 t2..., labels while_1 endwhile_1...
+- Algorithm pattern detection: loops, recursion, branching, math, sorting
+
+---
