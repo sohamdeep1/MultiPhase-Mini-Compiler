@@ -82,4 +82,13 @@ function buildScopeData(ast) {
   return scopes;
 }
 
-
+/* -- AST tree printer -- */
+var AST_NODE_COLORS = {
+  Program: '#c586c0', FunctionDecl: '#569cd6', Block: '#4a525a',
+  Param: '#4a525a', VarDecl: '#4ec9b0', IfStmt: '#dcdcaa',
+  WhileStmt: '#4ec9b0', ForStmt: '#4fc1ff', ReturnStmt: '#c586c0',
+  PrintStmt: '#ce9178', BinOp: '#d4d4d4', Assign: '#d4d4d4',
+  CallExpr: '#dcdcaa', Identifier: '#4fc1ff',
+  IntLiteral: '#b5cea8', FloatLiteral: '#b5cea8',
+  StringLiteral: '#ce9178', BoolLiteral: '#c586c0',
+};
