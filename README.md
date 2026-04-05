@@ -74,3 +74,11 @@ Recursive descent parser. Builds an Abstract Syntax Tree (AST).
 Handles: function declarations, variable declarations, if/else, while,
 for, return, print, and full expression precedence (7 levels).
 
+### Phase 3 -- Semantic Analysis (`src/semantic/semantic.js`)
+AST walker. Checks program correctness:
+- Multi-level scope-aware symbol table
+- Undeclared variable and function detection
+- Type compatibility (int, float, string, bool)
+- Duplicate declaration errors
+- Unused variable warnings
+
