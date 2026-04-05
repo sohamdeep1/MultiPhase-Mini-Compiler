@@ -28,3 +28,14 @@ function setStatus(type, msg) {
   txt.textContent = msg;
 }
 
+/* -- AST node counter -- */
+function countNodes(node) {
+  if (!node || typeof node !== 'object') return 0;
+  var count = 1;
+  Object.values(node).forEach(function(v) {
+    if (Array.isArray(v)) v.forEach(function(ch) { if (ch && typeof ch === 'object') count += countNodes(ch); });
+    else if (v && typeof v === 'object') count += countNodes(v);
+  });
+  return count;
+}
+
