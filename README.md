@@ -69,3 +69,8 @@ Character-level scanner. Produces a flat token stream from source text.
 Token types: KEYWORD, IDENTIFIER, INT_LIT, FLOAT_LIT, STR_LIT, BOOL_LIT,
 OPERATOR, PUNCT, COMMENT, UNKNOWN, EOF.
 
+### Phase 2 -- Syntax Parsing (`src/parser/parser.js`)
+Recursive descent parser. Builds an Abstract Syntax Tree (AST).
+Handles: function declarations, variable declarations, if/else, while,
+for, return, print, and full expression precedence (7 levels).
+
