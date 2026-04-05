@@ -16,3 +16,15 @@ function needCompiled() {
     tline('[!] Nothing compiled yet. Run: compile', 't-warn');
   }
 }
+
+/* -- Editor footer status -- */
+function setStatus(type, msg) {
+  var dot = document.getElementById('ef-dot');
+  var txt = document.getElementById('ef-msg');
+  if (type === 'ok')    dot.style.background = '#4ec9b0';
+  else if (type === 'error') dot.style.background = '#f44747';
+  else if (type === 'warn')  dot.style.background = '#ffcc02';
+  else                       dot.style.background = '#3d4450';
+  txt.textContent = msg;
+}
+
