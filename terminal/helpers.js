@@ -120,3 +120,26 @@ function printNode(node, prefix, isLast, depth) {
     ann +
   '</div>');
 
+    /* Collect children according to node type */
+  var children = [];
+  if (node.type === 'Program')       children = node.children || [];
+  else if (node.type === 'Block')    children = node.stmts    || [];
+  else if (node.type === 'FunctionDecl')
+    children = (node.params || []).concat(node.body ? [node.body] : []);
+  else if (node.type === 'VarDecl' && node.init) children = [node.init];
+  else if (node.type === 'IfStmt')   children = [node.cond, node.then, node.else].filter(Boolean);
+  else if (node.type === 'WhileStmt')children = [node.cond, node.body].filter(Boolean);
+  else if (node.type === 'ForStmt')  children = [node.init, node.cond, node.update, node.body].filter(Boolean);
+  else if (node.type === 'BinOp' || node.type === 'Assign') children = [node.left, node.right];
+  else if (node.type === 'UnaryOp')  children = [node.operand];
+  else if (node.type === 'GroupExpr')children = [node.expr];
+  else if (node.type === 'ExprStmt') children = [node.expr];
+  else if (node.type === 'ReturnStmt' && node.value) children = [node.value];
+  else if (node.type === 'PrintStmt')children = [node.arg];
+  else if (node.type === 'CallExpr') children = node.args || [];
+
+  var childPrefix = (prefix || '') + (isLast ? '    ' : '|   ');
+  children.forEach(function(child, i) {
+    printNode(child, childPrefix, i === children.length - 1, (depth || 0) + 1);
+  });
+}
