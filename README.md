@@ -88,3 +88,21 @@ Two outputs:
 - Algorithm pattern detection: loops, recursion, branching, math, sorting
 
 ---
+
+## Terminal Commands
+
+| Command          | Description                                      |
+|------------------|--------------------------------------------------|
+| `compile`        | Run all 4 phases on the editor source            |
+| `lex`            | Phase 1 -- token table + distribution chart      |
+| `parse`          | Phase 2 -- AST printed as an indented tree       |
+| `semantic`       | Phase 3 -- errors, scope tree, symbol table      |
+| `ir`             | Phase 4 -- 3-address IR code by function         |
+| `algos`          | Phase 4 -- detected algorithm patterns           |
+| `tokens [TYPE]`  | Filter token table (e.g. `tokens KEYWORD`)       |
+| `symbols`        | Alias for `semantic`                             |
+| `stats`          | Full compilation statistics                      |
+| `load <name>`    | Load sample: basic, loop, func, error            |
+| `clear` / `cls`  | Clear terminal output                            |
+| `help`           | Show command list                                |
+
