@@ -48,3 +48,13 @@ function handleKey(e) {
     return;
   }
 
+  /* Arrow Up -- older cmdHistory entry */
+  if (e.key === 'ArrowUp') {
+    e.preventDefault();
+    if (cmdHistIdx < cmdHistory.length - 1) {
+      cmdHistIdx++;
+      input.value = cmdHistory[cmdHistIdx];
+    }
+    return;
+  }
+
