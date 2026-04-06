@@ -106,3 +106,10 @@ Two outputs:
 | `clear` / `cls`  | Clear terminal output                            |
 | `help`           | Show command list                                |
 
+### Keyboard shortcuts
+- `Arrow Up / Down` -- command history
+- `Tab`             -- autocomplete command name
+- `Ctrl + L`        -- clear terminal
+
+---
+
