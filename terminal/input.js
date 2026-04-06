@@ -71,3 +71,21 @@ function handleKey(e) {
     return;
   }
 
+  /* Ctrl + L -- clear screen */
+  if (e.key === 'l' && e.ctrlKey) {
+    e.preventDefault();
+    COMMANDS.clear();
+    return;
+  }
+
+  /* Tab -- autocomplete command name */
+  if (e.key === 'Tab') {
+    e.preventDefault();
+    var partial = input.value.toLowerCase();
+    if (!partial) return;
+    var match = Object.keys(COMMANDS).find(function(k) {
+      return k.startsWith(partial) && k !== partial;
+    });
+    if (match) input.value = match;
+  }
+}
