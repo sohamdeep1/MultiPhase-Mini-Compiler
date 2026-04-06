@@ -58,3 +58,16 @@ function handleKey(e) {
     return;
   }
 
+  /* Arrow Down -- newer cmdHistory entry */
+  if (e.key === 'ArrowDown') {
+    e.preventDefault();
+    if (cmdHistIdx > 0) {
+      cmdHistIdx--;
+      input.value = cmdHistory[cmdHistIdx];
+    } else {
+      cmdHistIdx = -1;
+      input.value = '';
+    }
+    return;
+  }
+
