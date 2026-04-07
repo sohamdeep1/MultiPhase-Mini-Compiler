@@ -113,3 +113,13 @@ Two outputs:
 
 ---
 
+## How to Run
+
+```bash
+# Simply open in a browser
+open index.html
+
+# Or serve locally to avoid any CORS edge cases
+python3 -m http.server 8080
+# then open http://localhost:8080
+```
