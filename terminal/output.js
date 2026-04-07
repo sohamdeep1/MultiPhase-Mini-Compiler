@@ -32,3 +32,7 @@ function out(html) {
   container.scrollTop = container.scrollHeight;
 }
 
+function blank() {
+  out('<div class="t-blank"></div>');
+}
+
