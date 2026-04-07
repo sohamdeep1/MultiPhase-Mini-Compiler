@@ -40,3 +40,7 @@ function tline(text, cls) {
   out('<div class="t-line ' + (cls || '') + '">' + (text || '&nbsp;') + '</div>');
 }
 
+function echoCmd(cmd) {
+  out('<div class="t-cmd"><span class="pmt">compiler&gt;</span><span class="txt">' + esc(cmd) + '</span></div>');
+}
+
