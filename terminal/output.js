@@ -48,3 +48,6 @@ function ruler() {
   out('<hr class="t-divider">');
 }
 
+function progress() {
+  out('<div class="progress-bar"><div class="progress-fill"></div></div>');
+}
