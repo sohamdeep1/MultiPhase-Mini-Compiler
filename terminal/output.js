@@ -36,3 +36,7 @@ function blank() {
   out('<div class="t-blank"></div>');
 }
 
+function tline(text, cls) {
+  out('<div class="t-line ' + (cls || '') + '">' + (text || '&nbsp;') + '</div>');
+}
+
