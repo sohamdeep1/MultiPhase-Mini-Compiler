@@ -44,3 +44,7 @@ function echoCmd(cmd) {
   out('<div class="t-cmd"><span class="pmt">compiler&gt;</span><span class="txt">' + esc(cmd) + '</span></div>');
 }
 
+function ruler() {
+  out('<hr class="t-divider">');
+}
+
