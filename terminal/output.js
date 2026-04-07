@@ -15,3 +15,11 @@
  *   ruler()         -- horizontal divider
  *   progress()      -- animated 2px progress bar
  */
+
+function esc(s) {
+  return String(s)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
+}
+
