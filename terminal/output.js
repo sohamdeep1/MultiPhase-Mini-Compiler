@@ -23,3 +23,12 @@ function esc(s) {
     .replace(/>/g, '&gt;');
 }
 
+function out(html) {
+  var el  = document.createElement('div');
+  el.className = 'fade-in';
+  el.innerHTML = html;
+  var container = document.getElementById('output');
+  container.appendChild(el);
+  container.scrollTop = container.scrollHeight;
+}
+
