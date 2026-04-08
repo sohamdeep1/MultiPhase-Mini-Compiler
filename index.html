@@ -89,3 +89,40 @@
 
 </div><!-- /window -->
 
+<!-- =========================================================
+     SCRIPTS
+     Load order is critical -- each file depends on the ones
+     above it. Compiler phases must come before the terminal
+     layer which calls them.
+========================================================== -->
+
+<!-- Sample programs (must come first -- boot.js reads SAMPLES) -->
+<script src="samples/samples.js"></script>
+
+<!-- Phase 1: Lexer (defines TOKEN_TYPES, KEYWORDS, lexer()) -->
+<script src="src/lexer/lexer.js"></script>
+
+<!-- Phase 2: Parser (defines parser()) -->
+<script src="src/parser/parser.js"></script>
+
+<!-- Phase 3: Semantic analyser (defines semantic()) -->
+<script src="src/semantic/semantic.js"></script>
+
+<!-- Phase 4: IR codegen + algorithm detector -->
+<script src="src/codegen/codegen.js"></script>
+
+<!-- Terminal layer: shared state, output primitives, helpers -->
+<script src="terminal/state.js"></script>
+<script src="terminal/output.js"></script>
+<script src="terminal/helpers.js"></script>
+
+<!-- Terminal layer: command table, input handler, editor sync -->
+<script src="terminal/commands.js"></script>
+<script src="terminal/input.js"></script>
+<script src="terminal/editor.js"></script>
+
+<!-- Boot: runs last, after all globals are defined -->
+<script src="terminal/boot.js"></script>
+
+</body>
+</html>
