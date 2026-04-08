@@ -17,3 +17,14 @@
  *   compiled  -- true once a successful compile() has been run
  */
 
+var cmdHistory = [];
+var cmdHistIdx = -1;
+
+var _tokens  = [];
+var _ast     = null;
+var _sem     = null;
+var _ir      = [];
+var _algos   = [];
+
+var compiled = false;
+
