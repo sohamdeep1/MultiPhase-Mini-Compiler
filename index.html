@@ -24,3 +24,68 @@
     <div class="title-badge">v2.0</div>
   </div>
 
+  <!-- =====================================================
+       WORKSPACE  (editor left | terminal right)
+  ====================================================== -->
+  <div class="workspace">
+
+    <!-- ── LEFT: Source code editor ────────────────────── -->
+    <div class="editor-pane">
+
+      <!-- Editor header: filename + sample buttons -->
+      <div class="pane-header">
+        <span class="pane-title">source.mc</span>
+        <div class="sample-row">
+          <button class="sbtn" onclick="loadSample('basic')">basic</button>
+          <button class="sbtn" onclick="loadSample('loop')">loop</button>
+          <button class="sbtn" onclick="loadSample('func')">func</button>
+          <button class="sbtn" onclick="loadSample('error')">errors</button>
+        </div>
+      </div>
+
+      <!-- Editor body: line numbers + textarea -->
+      <div class="editor-wrap">
+        <div class="line-nums" id="lineNums"></div>
+        <textarea
+          id="src"
+          spellcheck="false"
+          oninput="syncLines()"
+          placeholder="// write your code here..."></textarea>
+      </div>
+
+      <!-- Editor footer: cursor position, char count, status -->
+      <div class="editor-footer">
+        <span id="ef-pos">Ln 1 Col 1</span>
+        <span id="ef-chars">0 chars</span>
+        <div class="ef-status">
+          <div class="ef-dot" id="ef-dot"></div>
+          <span id="ef-msg">ready</span>
+        </div>
+      </div>
+
+    </div><!-- /editor-pane -->
+
+    <!-- ── RIGHT: Terminal ──────────────────────────────── -->
+    <div class="terminal-pane">
+
+      <!-- Scrollable output area -->
+      <div class="term-output" id="output"></div>
+
+      <!-- Fixed input row at the bottom -->
+      <div class="term-input-row">
+        <span class="prompt-label">compiler&gt;</span>
+        <input
+          id="cmd-input"
+          type="text"
+          autocomplete="off"
+          spellcheck="false"
+          placeholder="type 'help' for commands..."
+          onkeydown="handleKey(event)">
+      </div>
+
+    </div><!-- /terminal-pane -->
+
+  </div><!-- /workspace -->
+
+</div><!-- /window -->
+
