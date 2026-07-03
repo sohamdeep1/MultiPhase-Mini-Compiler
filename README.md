@@ -1,3 +1,4 @@
+                                ********   Project Completed   ********
 # Multi-Phase MiniCompiler Terminal
 
 A browser-based multi-phase compiler with a terminal interface.
